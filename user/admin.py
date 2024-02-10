@@ -8,6 +8,7 @@ from .models import CustomUser, CustomUserManager
 class CustomUserAdmin(UserAdmin):  
     list_display = [
         'username',
+        'email',
         'date_joined',
         'last_login',
         'is_staff',
@@ -25,7 +26,7 @@ class CustomUserAdmin(UserAdmin):
     
     fieldsets = (
         ('Персональная информация',
-        {'fields': ('username', 'password',)}),
+        {'fields': ('username', 'email', 'password',)}),
         ('Даты',
         {'fields': ('date_joined', 'last_login',)}),
         ('Разрешения',
@@ -34,7 +35,7 @@ class CustomUserAdmin(UserAdmin):
     
     add_fieldsets = (
         ('Персональная информация',
-        {'fields': ('username', 'password1', 'password2',)}),
+        {'fields': ('username', 'email', 'password1', 'password2',)}),
         ('Даты',
         {'fields': ('date_joined', 'last_login',)}),
         ('Разрешения',
