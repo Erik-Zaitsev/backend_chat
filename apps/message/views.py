@@ -8,7 +8,7 @@ from rest_framework.authentication import TokenAuthentication
 
 # Create your views here.
 class MessageGetPostAPIView(views.APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated,]
     
     '''Показ сообщений в диалоге, сортировка по дате отправки'''
     def get(self, request, *args, **kwargs):
@@ -28,7 +28,6 @@ class MessageGetPostAPIView(views.APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'Отправлено сообщение': serializer.data})
- 
  
 
 class MessageDeleteAPIView(views.APIView):

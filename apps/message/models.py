@@ -1,5 +1,5 @@
 from django.db import models
-from user.models import CustomUser
+from apps.user.models import CustomUser
 from django.utils import timezone
 
 # Create your models here.
