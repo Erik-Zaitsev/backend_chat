@@ -3,6 +3,8 @@ from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from django.utils.translation import gettext_lazy as _
 
+from apps.user.models import CustomUser
+
 
 class AuthTokenCaseInsensitiveSerializer(AuthTokenSerializer):
 	def validate(self, attrs):
@@ -31,3 +33,16 @@ class AuthTokenCaseInsensitiveSerializer(AuthTokenSerializer):
 
 		attrs['user'] = user
 		return attrs
+
+
+class UserSerializer(serializers.ModelSerializer):
+	"""
+		Этот сериазайзер нужен для того чтобы на фронте не приходилось каждый раз запрашивать username пользователя
+		по его id. Я его переиспользую в других сериалайзерах, и он автоматом подставляет там нужные поля
+	"""
+	class Meta:
+		model = CustomUser
+		fields = [
+			'id',
+			'username'
+		]

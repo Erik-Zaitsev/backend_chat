@@ -2,7 +2,7 @@ from django.db import models
 from apps.user.models import CustomUser
 from django.utils import timezone
 
-# Create your models here.
+
 class Chat(models.Model):
     CHAT_TYPE_CHOICES = (
         ('General chat', 'Общий чат'),
@@ -20,11 +20,16 @@ class Chat(models.Model):
         
     def __str__(self):
         return self.name_chat        
-    
 
 
 class Message(models.Model):
-    chat = models.ForeignKey(Chat, verbose_name='Чат', on_delete=models.CASCADE)
+    """
+        Тут я добавил к полю chat related_name='messages'. Так как поле chat это по факту ссылка, то благодаря параметру
+        related_name я могу теперь из модели Chat получить все сообщения, Chat.objects.get(pk=pk).messages.all(). Так
+        код во вьюхе выглядит понятнее и мне нет необходимости, сначала получать из базы чат, а потом по нему искать все сообщения,
+        я сделал это одним запросом
+    """
+    chat = models.ForeignKey(Chat, verbose_name='Чат', on_delete=models.CASCADE, related_name='messages')
     author = models.ForeignKey(CustomUser, verbose_name='Отправитель', on_delete=models.CASCADE)
     text_message = models.TextField(verbose_name='Текст сообщения')
     date_publication = models.DateTimeField(verbose_name='Дата отправки', default=timezone.now)
@@ -35,4 +40,4 @@ class Message(models.Model):
         verbose_name_plural = 'Сообщения'    
     
     def __str__(self):
-        return self.text_message
+        return self.author.email
