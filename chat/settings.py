@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from os import getenv
+from django.utils.autoreload import django
 from dotenv import load_dotenv
 
 
@@ -42,12 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
-    'user',
-    'message',
+    'apps.user',
+    'apps.message',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'chat.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': getenv("DATABASE_default_ENGINE"),
+        'ENGINE': "django.db.backends.postgresql",
         'NAME': getenv("DATABASE_default_NAME"),
         'USER': getenv("DATABASE_default_USER"),
         'PASSWORD': getenv("DATABASE_default_PASSWORD"),
@@ -142,11 +142,11 @@ AUTH_USER_MODEL = 'user.CustomUser'
 
 # Настройки DRF
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-    ),
-    
-    'DEFAULT_PERMISSIONS_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 }
