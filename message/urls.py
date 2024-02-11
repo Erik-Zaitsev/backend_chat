@@ -1,7 +1,5 @@
 from django.urls import path
-from .views import MessageGetAPIView
+# from .views import MessageGetPostAPIView, MessageDeleteAPIView
 
 
-urlpatterns = [
-    path('<int:pk>/', MessageGetAPIView.as_view(), name='get_dialog'),
-]
+urlpatterns = []

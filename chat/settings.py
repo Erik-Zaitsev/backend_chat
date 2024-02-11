@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
     'user',
     'message',
 ]
@@ -137,3 +139,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Говорю Django, что буду использовать свою модель User
 AUTH_USER_MODEL = 'user.CustomUser'
+
+# Настройки DRF
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    
+    'DEFAULT_PERMISSIONS_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}

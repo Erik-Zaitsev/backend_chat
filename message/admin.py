@@ -5,7 +5,7 @@ from .models import Chat, Message
 # Register your models here.
 @admin.register(Chat)
 class ChatAdmin(admin.ModelAdmin):
-    list_display = ['type_chat',]
+    list_display = ['name_chat', 'type_chat',]
     
     list_filter = ['type_chat',]
 

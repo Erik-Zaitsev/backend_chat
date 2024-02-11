@@ -8,6 +8,7 @@ django = "==4.2.8"
 djangorestframework = "*"
 psycopg2 = "*"
 python-dotenv = "*"
+djoser = "*"
 
 [dev-packages]
 

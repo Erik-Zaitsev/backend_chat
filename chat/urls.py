@@ -15,9 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from message.views import MessageGetPostAPIView, MessageDeleteAPIView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('message/', include('message.urls')),
+    path('api/v1/chat/<int:pk>/', MessageGetPostAPIView.as_view(), name='get_chat_or_send_message'),
+    path('api/v1/message/<int:pk>/', MessageDeleteAPIView.as_view(), name='delete_message_from_chat'),
+    path('api/v1/auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

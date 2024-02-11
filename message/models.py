@@ -9,6 +9,7 @@ class Chat(models.Model):
         ('Dialog', 'Диалог'),
     )
 
+    name_chat = models.CharField(verbose_name='Название чата', max_length=100, default='ewrr')
     type_chat = models.CharField(verbose_name='Тип чата', max_length=15, 
                                  choices=CHAT_TYPE_CHOICES, default='Dialog')
     members = models.ManyToManyField(CustomUser, verbose_name='Участники')
@@ -18,7 +19,7 @@ class Chat(models.Model):
         verbose_name_plural = 'Чаты' 
         
     def __str__(self):
-        return self.type_chat        
+        return self.name_chat        
     
 
 
