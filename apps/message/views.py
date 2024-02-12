@@ -20,10 +20,6 @@ class MessageGetPostAPIView(views.APIView):
     def post(self, request, *args, **kwargs):
         chat_id = kwargs.get('pk', None)        
         queryset = Chat.objects.get(pk=chat_id).members.all()
-        # user = CustomUser.objects.get()
-        print(queryset)
-        print(request.data)
-        # if request.data in queryset:
         serializer = MessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

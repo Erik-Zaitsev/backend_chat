@@ -45,9 +45,8 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
-    'user',
-    'message',
+    'apps.user',
+    'apps.message',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'chat.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -78,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'chat.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
@@ -86,7 +85,7 @@ WSGI_APPLICATION = 'chat.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': getenv("DATABASE_default_ENGINE"),
+        'ENGINE': django.db.backends.postgresql,
         'NAME': getenv("DATABASE_default_NAME"),
         'USER': getenv("DATABASE_default_USER"),
         'PASSWORD': getenv("DATABASE_default_PASSWORD"),

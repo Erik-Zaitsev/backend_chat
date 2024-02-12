@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from message.views import MessageGetPostAPIView, MessageDeleteAPIView
+from apps.message.views import MessageGetPostAPIView, MessageDeleteAPIView
 
 
 urlpatterns = [
