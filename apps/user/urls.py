@@ -3,5 +3,5 @@ from apps.user.views import CustomObtainAuthToken
 
 
 urlpatterns = [
-    path('', CustomObtainAuthToken.as_view()),
+    path('auth/', CustomObtainAuthToken.as_view()),
 ]

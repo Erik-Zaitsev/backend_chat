@@ -1,13 +1,12 @@
 from django.contrib.auth import user_logged_in
 from rest_framework.authtoken.views import ObtainAuthToken
-# from apps.user.serializers import AuthTokenCaseInsensitiveSerializer
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.serializers import AuthTokenSerializer
+from .serializers import AuthTokenCaseInsensitiveSerializer
 
 # Create your views here.
 class CustomObtainAuthToken(ObtainAuthToken):
-    # serializer_class = AuthTokenSerializer
+    serializer_class = AuthTokenCaseInsensitiveSerializer
     
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, 
