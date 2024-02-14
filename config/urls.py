@@ -16,13 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from apps.message.views import MessageGetPostAPIView, MessageDeleteAPIView
+from rest_framework.authtoken import views
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/chat/<int:pk>/', MessageGetPostAPIView.as_view(), name='get_chat_or_send_message'),
-    path('api/v1/message/<int:pk>/', MessageDeleteAPIView.as_view(), name='delete_message_from_chat'),
-    path('api/v1/auth/', include('djoser.urls')),
-    re_path(r'^auth/', include('djoser.urls.authtoken')),
+    path('api/v1/chat/', include('apps.message.urls')),
+    # path('api/v1/auth/', include('apps.user.urls')),
+    path('api-token-auth/', include('apps.user.urls')),
+    # path('api-token-auth/', views.obtain_auth_token)
 ]
