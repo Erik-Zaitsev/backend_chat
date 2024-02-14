@@ -68,7 +68,6 @@ class CustomUserManager(BaseUserManager):
         return CustomUser
 
 
-
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     '''Класс для описания модели Пользователя'''
     
