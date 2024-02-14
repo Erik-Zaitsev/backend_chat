@@ -8,8 +8,11 @@ django = "==4.2.8"
 djangorestframework = "*"
 psycopg2 = "*"
 python-dotenv = "*"
+<<<<<<< HEAD
+=======
 djoser = "*"
 drf-yasg = "*"
+>>>>>>> 944a160b2fa8f031a7fa5d71894a8143aa288453
 
 [dev-packages]
 

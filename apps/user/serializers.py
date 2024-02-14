@@ -2,11 +2,29 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from django.utils.translation import gettext_lazy as _
+<<<<<<< HEAD
+=======
 
+>>>>>>> 944a160b2fa8f031a7fa5d71894a8143aa288453
 from apps.user.models import CustomUser
 
 
 class AuthTokenCaseInsensitiveSerializer(AuthTokenSerializer):
+<<<<<<< HEAD
+    def validate(self, attrs):
+        pass
+
+
+class UserSerializer(serializers.ModelSerializer):
+    '''Сериалайзер для того, чтобы на фронте не приходилось каждый раз запрашивать username пользователя по его id'''
+    
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id',
+            'username',
+        ]
+=======
 	def validate(self, attrs):
 		username = attrs.get('username')
 		password = attrs.get('password')
@@ -46,3 +64,4 @@ class UserSerializer(serializers.ModelSerializer):
 			'id',
 			'username'
 		]
+>>>>>>> 944a160b2fa8f031a7fa5d71894a8143aa288453
