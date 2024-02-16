@@ -41,8 +41,6 @@ class MessageGetPostAPIView(views.APIView):
         return Response({'sent_message': serializer.data})
 
 
-    
- 
 
 class MessageDeleteAPIView(views.APIView):
     permission_classes = (IsAuthenticated,)
@@ -66,9 +64,9 @@ class MakeMessageReadAPIView(views.APIView):
         '''Метод редактирует поле "is_read" указанного сообщения'''
         
         try:
-            Message.objects.filter(pk=pk).update(is_read=True)
+            Chat.objects.get(pk=pk).messages.all().update(is_read=True)
         except:
-            return Response('Message not found', status=HTTP_404_NOT_FOUND)
+            return Response('Messages not found', status=HTTP_404_NOT_FOUND)
 
-        return Response({'result', 'Message was read!'})
+        return Response({'result', 'Messages in this chat was read!'})
             
