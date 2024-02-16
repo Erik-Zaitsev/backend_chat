@@ -39,7 +39,9 @@ class MessageGetPostAPIView(views.APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'sent_message': serializer.data})
- 
+
+
+    
  
 
 class MessageDeleteAPIView(views.APIView):
@@ -55,3 +57,18 @@ class MessageDeleteAPIView(views.APIView):
                         
         return Response({'result': 'Message deleted!'})
     
+
+    
+class MakeMessageReadAPIView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def patch(self, request, pk):
+        '''Метод редактирует поле "is_read" указанного сообщения'''
+        
+        try:
+            Message.objects.filter(pk=pk).update(is_read=True)
+        except:
+            return Response('Message not found', status=HTTP_404_NOT_FOUND)
+
+        return Response({'result', 'Message was read!'})
+            

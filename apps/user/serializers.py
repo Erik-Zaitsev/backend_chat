@@ -19,7 +19,6 @@ class AuthTokenCaseInsensitiveSerializer(serializers.Serializer):
         label=_("Token"),
         read_only=True
     )
-
     def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')

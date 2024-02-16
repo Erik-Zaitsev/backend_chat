@@ -39,4 +39,3 @@ class MessageSerializer(serializers.ModelSerializer):
         
         return Message.objects.create(**validated_data)
           
-    
