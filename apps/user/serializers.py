@@ -21,24 +21,30 @@ class AuthTokenCaseInsensitiveSerializer(serializers.Serializer):
     )
     
     def validate(self, attrs):
+        # получаем почту и пароль из тела запроса
         email = attrs.get('email')
         password = attrs.get('password')
-
+        
+        # проверяем поля на значение None
         if email and password:
             user_obj = get_user_model().objects.filter(email=email).first()
             
+            # если объект не найден в бд по полю 'Почта'- вызываем исключение
             if not user_obj:
                 msg = _('There is no user with such credentials.')
                 raise serializers.ValidationError(msg, code='authorization')
             
+            # если поле 'is_active' у записи имеет значение False - вызываем исключение
             if not user_obj.is_active:
                 msg = _('The "is_active" field at user must be set to True.')
                 raise serializers.ValidationError(msg, code='authorization')           
             
+            # аунтефицируем пользователя
             user = authenticate(request=self.context.get('request'),
                                 email=user_obj.email,
                                 password=password)
-
+            
+            # если переданные для аунтефикации данные(в д.с. пароль) неправильные - вызываем исключение
             if not user:
                 msg = _('Incorrect password.')
                 raise serializers.ValidationError(msg, code='authorization')
@@ -60,3 +66,26 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'username',
         ]
+
+
+
+class RegisterUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id',
+            'username',
+            'email',
+            'password',
+            'date_joined',
+            'last_login',
+            'is_staff',
+            'is_superuser',
+            'is_active',
+        ]
+        
+    def create(self, validated_data):
+        user = super(RegisterUserSerializer, self).create(validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user

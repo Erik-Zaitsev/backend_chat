@@ -2,7 +2,9 @@ from django.contrib.auth import user_logged_in
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from .serializers import AuthTokenCaseInsensitiveSerializer
+from .serializers import AuthTokenCaseInsensitiveSerializer, RegisterUserSerializer
+from rest_framework import views
+
 
 # Create your views here.
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -19,3 +21,13 @@ class CustomObtainAuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'email': user.email,
         })
+
+
+
+class RegisterUserAPIView(views.APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = RegisterUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        return Response({'Пользователь был добавлен': serializer.data})
