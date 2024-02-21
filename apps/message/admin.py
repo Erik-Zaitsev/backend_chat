@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Chat, Message
+from .models import Chat, Message, IsReadMessage
 
 
 # Register your models here.
@@ -17,13 +17,18 @@ class MessageAdmin(admin.ModelAdmin):
         'author',
         'text_message',
         'date_publication',
-        'is_read',
     ]
-    
-    list_filter = ['is_read',]
     
     search_fields = ['text_message',]
     
     search_help_text = 'Поиск по полям: Текст сообщения'
     
+    
+@admin.register(IsReadMessage)
+class IsReadMessageAdmin(admin.ModelAdmin):
+    list_display = [
+        'message',
+        'user_is_read',
+        'is_read',
+    ]
     

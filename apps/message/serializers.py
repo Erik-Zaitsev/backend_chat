@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Message, Chat
+from .models import Message, Chat, IsReadMessage
 from apps.user.serializers import UserSerializer
 
 
@@ -28,7 +28,6 @@ class MessageSerializer(serializers.ModelSerializer):
             'author',
             'text_message',
             'date_publication',
-            'is_read',
         ]
         
     def create(self, validated_data):
@@ -39,3 +38,24 @@ class MessageSerializer(serializers.ModelSerializer):
         
         return Message.objects.create(**validated_data)
           
+          
+          
+class IsReadMessageSerializer(serializers.ModelSerializer):
+    message = MessageSerializer
+    user_is_read = UserSerializer(required=False)
+    
+    class Meta:
+        model = IsReadMessage
+        fields = [
+            'id',
+            'message',
+            'user_is_read',
+            'is_read',
+        ]
+    
+    def create(self, validated_data):
+        validated_data['message'] = request.data.message
+        validated_data['user_is_read'] = self.context['user']
+        validated_data['is_read'] = True
+        
+        return IsReadMessage.objects.create(**validated_data)

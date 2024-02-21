@@ -5,10 +5,10 @@ from apps.user.models import CustomUser
 
 
 class AuthTokenCaseInsensitiveSerializer(serializers.Serializer):
-    email = serializers.CharField(
+    email = serializers.EmailField(
         label=_("Email"),
         write_only=True
-    )
+        )
     password = serializers.CharField(
         label=_("Password"),
         style={'input_type': 'password'},
@@ -19,6 +19,7 @@ class AuthTokenCaseInsensitiveSerializer(serializers.Serializer):
         label=_("Token"),
         read_only=True
     )
+    
     def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')
@@ -32,14 +33,14 @@ class AuthTokenCaseInsensitiveSerializer(serializers.Serializer):
             
             if not user_obj.is_active:
                 msg = _('The "is_active" field at user must be set to True.')
-                raise serializers.ValidationError(msg, code='authorization')
+                raise serializers.ValidationError(msg, code='authorization')           
             
             user = authenticate(request=self.context.get('request'),
                                 email=user_obj.email,
                                 password=password)
 
             if not user:
-                msg = _('Unable to log in with provided credentials.')
+                msg = _('Incorrect password.')
                 raise serializers.ValidationError(msg, code='authorization')
         else:
             msg = _('The fields "email" and "password" are required.')
