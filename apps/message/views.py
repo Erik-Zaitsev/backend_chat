@@ -39,10 +39,9 @@ class MessageGetPostAPIView(views.APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
-        message = Message.objects.latest('id')
-        for user in members:
-            if user != request.user:
-                IsReadMessage.objects.create(message=message, user_is_read=user) 
+        latest_message = Message.objects.latest('id')
+        unread_messages = [IsReadMessage(message=latest_message, user_is_read=user) for user in members if user != request.user]
+        IsReadMessage.objects.bulk_create(unread_messages)
            
         return Response({'sent_message': serializer.data})
 
@@ -52,13 +51,17 @@ class MessageDeleteAPIView(views.APIView):
     permission_classes = (IsAuthenticated,)
                
     def delete(self, request, pk):
-        '''Удаление сообщение из чата, если оно ещё не прочитано, если прочитано - то удалять нельзя'''
-
+        '''Удаление сообщение из чата, если оно ещё не прочитано, если прочитано хотя бы одним участником- то удалять нельзя'''
         try:
-            Message.objects.get(pk=pk, is_read=False, author=request.user).delete()
-        except DoesNotExist:
-            return Response('Message not found!', status=HTTP_404_NOT_FOUND)
-                        
+            msgs = Message.objects.get(pk=pk, author=request.user).is_read_messages.all()  
+        except Message.DoesNotExist:
+            return Response('Message not found!', status=HTTP_404_NOT_FOUND) 
+        
+        for msg in msgs:
+            if msg.is_read:
+                return Response({'result': 'Сообщение уже прочитано! Удалить нельзя!'})
+
+        msgs.delete()        
         return Response({'result': 'Message deleted!'})
     
  
