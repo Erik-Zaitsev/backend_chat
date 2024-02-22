@@ -1,5 +1,5 @@
 from .models import Chat, Message, IsReadMessage
-from .serializers import MessageSerializer, IsReadMessageSerializer
+from .serializers import MessageSerializer
 from rest_framework import views
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -66,15 +66,15 @@ class MessageDeleteAPIView(views.APIView):
     
  
         
-class MakeIsReadMessageAPIView(views.APIView):
-    permission_classes = (IsAuthenticated,)
+# class MakeIsReadMessageAPIView(views.APIView):
+#     permission_classes = (IsAuthenticated,)
     
-    def post(self, request, *args, **kwargs):
-        '''Метод берёт переданное сообщение, прочитавшего его человека и создаёт для него модель прочитанного сообщения '''
+#     def post(self, request, *args, **kwargs):
+#         '''Метод берёт переданное сообщение, прочитавшего его человека и создаёт для него модель прочитанного сообщения '''
         
-        serializer = IsReadMessageSerializer(data=request.data, 
-                                             context={'user': request.user,})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'This message was read!': serializer.data})
+#         serializer = IsReadMessageSerializer(data=request.data, 
+#                                              context={'user': request.user,})
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({'This message was read!': serializer.data})
     
