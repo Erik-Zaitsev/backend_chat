@@ -38,6 +38,12 @@ class MessageGetPostAPIView(views.APIView):
         
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        
+        message = Message.objects.latest('id')
+        for user in members:
+            if user != request.user:
+                IsReadMessage.objects.create(message=message, user_is_read=user) 
+           
         return Response({'sent_message': serializer.data})
 
 

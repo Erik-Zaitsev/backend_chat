@@ -56,4 +56,4 @@ class IsReadMessage(models.Model):
         verbose_name_plural = 'Прочитанные сообщения'
         
     def __str__(self):
-        return self.message
+        return self.message.text_message

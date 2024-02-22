@@ -7,5 +7,4 @@ urlpatterns = [
     path('api/v1/chat/', include('apps.message.urls')),
     path('api-token-auth/', include('apps.user.urls')),
     path('register/', include('apps.user.urls')),
-
 ]
