@@ -28,7 +28,23 @@ class MessageAdmin(admin.ModelAdmin):
 class IsReadMessageAdmin(admin.ModelAdmin):
     list_display = [
         'message',
-        'user_is_read',
+        # 'users_is_read',
         'is_read',
     ]
     
+    # def get_queryset(self, request):
+    #     """
+    #     Return a QuerySet of all model instances that can be edited by the
+    #     admin site. This is used by changelist_view.
+    #     """
+    #     # qs = self.model._default_manager.get_queryset()
+    #     # # TODO: this should be handled by some parameter to the ChangeList.
+    #     # ordering = self.get_ordering(request)
+    #     # if ordering:
+    #     #     qs = qs.order_by(*ordering)
+    #     # return qs
+    
+    #     # queryset = super().get_queryset(request)
+    #     # queryset = queryset.prefetch_related('members')
+    #     # return queryset 
+    #     return Chat.members

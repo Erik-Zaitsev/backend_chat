@@ -42,20 +42,19 @@ class MessageSerializer(serializers.ModelSerializer):
           
 # class IsReadMessageSerializer(serializers.ModelSerializer):
 #     message = MessageSerializer
-#     user_is_read = UserSerializer(required=False)
+#     users_is_read = UserSerializer(required=False, many=True)
     
 #     class Meta:
 #         model = IsReadMessage
 #         fields = [
 #             'id',
+#             'chat',
 #             'message',
-#             'user_is_read',
+#             'users_is_read',
 #             'is_read',
 #         ]
     
-#     def create(self, validated_data):
-#         validated_data['message'] = request.data.message
-#         validated_data['user_is_read'] = self.context['user']
-#         validated_data['is_read'] = True
-        
-#         return IsReadMessage.objects.create(**validated_data)
+#     def update(self, instance, validated_data):
+#         instance.chat = validated_data.get('chat', instance.chat)
+#         instance.message = validated_data.get('message', instance.message)
+#         instance.users_is_read = validated_data.get('users_is_read', instance.users_is_read)

@@ -40,8 +40,9 @@ class MessageGetPostAPIView(views.APIView):
         serializer.save()
         
         latest_message = Message.objects.latest('id')
-        unread_messages = [IsReadMessage(message=latest_message, user_is_read=user) for user in members if user != request.user]
-        IsReadMessage.objects.bulk_create(unread_messages)
+        unread_message = IsReadMessage.objects.create(chat=latest_message.chat, message=latest_message)
+        unread_message.save()
+        unread_message.users_is_read.add(request.user)
            
         return Response({'sent_message': serializer.data})
 
@@ -64,17 +65,18 @@ class MessageDeleteAPIView(views.APIView):
         msgs.delete()        
         return Response({'result': 'Message deleted!'})
     
- 
+
+
+class MakeIsReadMessageAPIView(views.APIView):
+    def patch(self, request, pk):
         
-# class MakeIsReadMessageAPIView(views.APIView):
-#     permission_classes = (IsAuthenticated,)
-    
-#     def post(self, request, *args, **kwargs):
-#         '''Метод берёт переданное сообщение, прочитавшего его человека и создаёт для него модель прочитанного сообщения '''
+        members = IsReadMessage.objects.get(message_id=pk).users_is_read.all()
+        if request.user in members:
+            return Response({'result': 'Сообщение уже прочитано этим пользователем!'})
         
-#         serializer = IsReadMessageSerializer(data=request.data, 
-#                                              context={'user': request.user,})
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response({'This message was read!': serializer.data})
-    
+        try:
+            IsReadMessage.objects.get(message_id=pk).users_is_read.add(request.user)
+        except Message.DoesNotExist:
+            return Response('Message not found!', status=HTTP_404_NOT_FOUND)
+        
+        return Response({'result': 'Сообщение прочитано!'})

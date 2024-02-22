@@ -47,9 +47,10 @@ class Message(models.Model):
 class IsReadMessage(models.Model):
     '''Модель для прочитанных сообщений'''
     
+    chat = models.ForeignKey(Chat, verbose_name='Чат', on_delete=models.CASCADE, related_name='chat')
     message = models.ForeignKey(Message, verbose_name='Сообщение', on_delete=models.CASCADE, related_name='is_read_messages')
-    user_is_read = models.ForeignKey(CustomUser, verbose_name='Прочитавший пользователь', on_delete=models.CASCADE)
-    is_read = models.BooleanField(verbose_name='Прочитано', default=False)
+    users_is_read = models.ManyToManyField(CustomUser, verbose_name='Прочитавшие пользователи')
+    is_read = models.BooleanField(verbose_name='Прочитано', default=True)
     
     class Meta:
         verbose_name = 'Прочитанное сообщение'
