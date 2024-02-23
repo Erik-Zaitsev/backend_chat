@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Chat, Message, IsReadMessage
+from .models import Chat, Message
 
 
 # Register your models here.
@@ -24,13 +24,13 @@ class MessageAdmin(admin.ModelAdmin):
     search_help_text = 'Поиск по полям: Текст сообщения'
     
     
-@admin.register(IsReadMessage)
-class IsReadMessageAdmin(admin.ModelAdmin):
-    list_display = [
-        'message',
-        # 'users_is_read',
-        'is_read',
-    ]
+# @admin.register(IsReadMessage)
+# class IsReadMessageAdmin(admin.ModelAdmin):
+#     list_display = [
+#         'message',
+#         # 'users_is_read',
+#         'is_read',
+#     ]
     
     # def get_queryset(self, request):
     #     """

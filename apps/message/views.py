@@ -1,4 +1,4 @@
-from .models import Chat, Message, IsReadMessage
+from .models import Chat, Message
 from .serializers import MessageSerializer
 from rest_framework import views
 from rest_framework.response import Response
@@ -30,20 +30,15 @@ class MessageGetPostAPIView(views.APIView):
         
         if request.user not in members:
             return Response('У пользователя недостаточно прав!', status=HTTP_403_FORBIDDEN)
-        
+
         serializer = MessageSerializer(data=request.data, 
                                        context={
                                             'user': request.user, 
-                                            'chat': pk})
-        
+                                            'chat': pk,
+                                            'members': members})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
-        latest_message = Message.objects.latest('id')
-        unread_message = IsReadMessage.objects.create(chat=latest_message.chat, message=latest_message)
-        unread_message.save()
-        unread_message.users_is_read.add(request.user)
-           
         return Response({'sent_message': serializer.data})
 
 

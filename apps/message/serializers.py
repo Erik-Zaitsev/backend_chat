@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Message, Chat, IsReadMessage
+from .models import Message, Chat
 from apps.user.serializers import UserSerializer
 
 
@@ -19,6 +19,7 @@ class ChatSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     chat = ChatSerializer(read_only=True)
     author = UserSerializer(required=False)
+    unread_users = UserSerializer(many=True)
     
     class Meta:
         model = Message
@@ -28,13 +29,15 @@ class MessageSerializer(serializers.ModelSerializer):
             'author',
             'text_message',
             'date_publication',
+            'unread_users',
         ]
         
     def create(self, validated_data):
         chat = Chat.objects.get(id=self.context['chat'])
-        
+
         validated_data['author'] = self.context['user']
         validated_data['chat'] = chat
+        validated_data['unread_users'] = self.context['members']
         
         return Message.objects.create(**validated_data)
           
