@@ -1,6 +1,7 @@
 from django.db import models
 from apps.user.models import CustomUser
 from django.utils import timezone
+from smart_selects.db_fields import ChainedManyToManyField, ChainedForeignKey
 
 
 class Chat(models.Model):
@@ -18,7 +19,7 @@ class Chat(models.Model):
     type_chat = models.CharField(verbose_name='Тип чата', max_length=15, 
                                  choices=CHAT_TYPE_CHOICES, default='Dialog')
     members = models.ManyToManyField(CustomUser, verbose_name='Участники')
-    
+
     class Meta:
         verbose_name = 'Чат'
         verbose_name_plural = 'Чаты' 
@@ -30,15 +31,37 @@ class Chat(models.Model):
 class Message(models.Model):
     '''Модель для сообщения'''
     
-    # def get_unread_users(self):
-    #     print(self.chat.members)
-    #     return self.chat.members
-    
-    chat = models.ForeignKey(Chat, verbose_name='Чат', on_delete=models.CASCADE, related_name='messages')
-    author = models.ForeignKey(CustomUser, verbose_name='Отправитель', on_delete=models.CASCADE, related_name='messages')
-    text_message = models.TextField(verbose_name='Текст сообщения')
-    date_publication = models.DateTimeField(verbose_name='Дата отправки', default=timezone.now)
-    unread_users = models.ManyToManyField(CustomUser, verbose_name='Непрочитавшие пользователи', related_name='unread_messages')
+    chat = models.ForeignKey(
+        Chat, 
+        verbose_name='Чат', 
+        on_delete=models.CASCADE, 
+        related_name='messages'
+        )
+    author = ChainedForeignKey(
+        CustomUser,
+        chained_field='chat',
+        chained_model_field='chat',
+        show_all=True,
+        auto_choose=True,
+        sort=True,
+        verbose_name='Отправитель',
+        on_delete=models.CASCADE,
+        related_name='messages'
+        )
+    text_message = models.TextField(
+        verbose_name='Текст сообщения'
+        )
+    date_publication = models.DateTimeField(
+        verbose_name='Дата отправки', 
+        default=timezone.now
+        )
+    unread_users = ChainedManyToManyField(
+        CustomUser,
+        chained_field='chat',
+        chained_model_field='chat',
+        auto_choose=True,
+        verbose_name='Непрочитавшие пользователи'
+        )
         
     class Meta:
         verbose_name = 'Сообщение'
@@ -46,20 +69,4 @@ class Message(models.Model):
     
     def __str__(self):
         return self.text_message
-
-
-
-# class IsReadMessage(models.Model):
-#     '''Модель для прочитанных сообщений'''
     
-#     chat = models.ForeignKey(Chat, verbose_name='Чат', on_delete=models.CASCADE, related_name='chat')
-#     message = models.ForeignKey(Message, verbose_name='Сообщение', on_delete=models.CASCADE, related_name='is_read_messages')
-#     users_is_read = models.ManyToManyField(CustomUser, verbose_name='Прочитавшие пользователи')
-#     is_read = models.BooleanField(verbose_name='Прочитано', default=True)
-    
-#     class Meta:
-#         verbose_name = 'Прочитанное сообщение'
-#         verbose_name_plural = 'Прочитанные сообщения'
-        
-#     def __str__(self):
-#         return self.message.text_message

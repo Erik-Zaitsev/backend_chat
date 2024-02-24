@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'apps.user',
     'apps.message',
+    'smart_selects'
 ]
 
 MIDDLEWARE = [
@@ -162,3 +163,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
+
+# Настройки django-smart-selects
+USE_DJANGO_JQUERY = True
