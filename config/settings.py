@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'apps.user',
     'apps.message',
-    'smart_selects'
+    'smart_selects',
 ]
 
 MIDDLEWARE = [
@@ -123,8 +123,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'ru'
 
 LANGUAGES = (
-    ('en', _('English')),
     ('ru', _('Russian')),
+    ('en', _('English')),
 )
 
 LOCALE_PATHS = [BASE_DIR / 'locale']
@@ -132,8 +132,6 @@ LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 

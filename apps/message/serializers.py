@@ -19,7 +19,7 @@ class ChatSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     chat = ChatSerializer(read_only=True)
     author = UserSerializer(required=False)
-    unread_users = UserSerializer(many=True)
+    unread_users = UserSerializer(many=True, required=False)
     
     class Meta:
         model = Message
@@ -37,6 +37,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
         validated_data['author'] = self.context['user']
         validated_data['chat'] = chat
-        validated_data['unread_users'] = self.context['members']
+        message = Message.objects.create(**validated_data)
         
-        return Message.objects.create(**validated_data)
+        message.unread_users.add(*(i.id for i in self.context['members']))
+        return message

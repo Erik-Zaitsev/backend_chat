@@ -26,7 +26,7 @@ class CustomUserAdmin(UserAdmin):
     
     fieldsets = (
         ('Персональная информация',
-        {'fields': ('username', 'email', 'password', 'is_active')}),
+        {'fields': ('username', 'email', 'password', 'is_active',)}),
         ('Даты',
         {'fields': ('date_joined', 'last_login',)}),
         ('Разрешения',
@@ -35,7 +35,7 @@ class CustomUserAdmin(UserAdmin):
     
     add_fieldsets = (
         ('Персональная информация',
-        {'fields': ('username', 'email', 'password1', 'password2',)}),
+        {'fields': ('username', 'email', 'password1', 'password2', 'is_active',)}),
         ('Даты',
         {'fields': ('date_joined', 'last_login',)}),
         ('Разрешения',

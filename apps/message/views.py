@@ -54,9 +54,8 @@ class MessageDeleteAPIView(views.APIView):
             members = Message.objects.get(pk=pk).chat.members.all()
         except Message.DoesNotExist:
             return Response('Message not found!', status=HTTP_404_NOT_FOUND) 
-        print(unread_users)
-        print(members)
-        if unread_users != members:
+
+        if members.difference(unread_users):
             return Response({'result': 'Сообщение уже прочитано! Удалить нельзя!'})
 
         Message.objects.get(pk=pk).delete()     
@@ -65,14 +64,23 @@ class MessageDeleteAPIView(views.APIView):
 
 
 class MakeIsReadMessageAPIView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+    
     def patch(self, request, pk):
         
-        members = Message.objects.get(pk=pk).unread_users.all()
-        if request.user not in members:
+        unread_members = Message.objects.get(pk=pk).unread_users.all()
+        message = Message.objects.get(pk=pk)
+        if request.user not in unread_members:
             return Response({'result': 'Сообщение уже прочитано этим пользователем!'})
         
         try:
-            Message.objects.get(pk=pk).unread_users.delete(request.user)
+            # Message.objects.get(pk=pk).unread_users.delete(request.user)
+            unread_messages = Message.objects.filter(pk__lte=pk, chat_id=message.chat_id)
+            # [msg.unread_users.delete(request.user) for msg in unread_messages]
+            print(unread_members)
+            # print(dir(unread_messages))
+            for msg in unread_messages.values():
+                print(msg)
         except Message.DoesNotExist:
             return Response('Message not found!', status=HTTP_404_NOT_FOUND)
         
