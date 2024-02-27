@@ -62,26 +62,32 @@ class MessageDeleteAPIView(views.APIView):
         return Response({'result': 'Message deleted!'})
     
 
-
 class MakeIsReadMessageAPIView(views.APIView):
     permission_classes = (IsAuthenticated,)
     
     def patch(self, request, pk):
         
         unread_members = Message.objects.get(pk=pk).unread_users.all()
-        message = Message.objects.get(pk=pk)
         if request.user not in unread_members:
             return Response({'result': 'Сообщение уже прочитано этим пользователем!'})
+
+        message = Message.objects.get(pk=pk)
+        # Берем все сообщения у которых дата публикации старше той которую нам отправил фронт
+        messages = Message.objects.filter(date_publication__gt=message.date_publication)
+        if messages:
+            for i in messages:
+                i.unread_users.all().remove(request.user)
+                i.save()
         
-        try:
-            # Message.objects.get(pk=pk).unread_users.delete(request.user)
-            unread_messages = Message.objects.filter(pk__lte=pk, chat_id=message.chat_id)
-            # [msg.unread_users.delete(request.user) for msg in unread_messages]
-            print(unread_members)
-            # print(dir(unread_messages))
-            for msg in unread_messages.values():
-                print(msg)
-        except Message.DoesNotExist:
-            return Response('Message not found!', status=HTTP_404_NOT_FOUND)
+        # try:
+        #     # Message.objects.get(pk=pk).unread_users.delete(request.user)
+        #     unread_messages = Message.objects.filter(pk__lte=pk, chat_id=message.chat_id)
+        #     # [msg.unread_users.delete(request.user) for msg in unread_messages]
+        #     print(unread_members)
+        #     # print(dir(unread_messages))
+        #     for msg in unread_messages.values():
+        #         print(msg)
+        # except Message.DoesNotExist:
+        #     return Response('Message not found!', status=HTTP_404_NOT_FOUND)
         
         return Response({'result': 'Сообщение прочитано!'})
