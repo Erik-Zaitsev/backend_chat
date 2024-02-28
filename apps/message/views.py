@@ -36,7 +36,8 @@ class MessageGetPostAPIView(views.APIView):
                                        context={
                                             'user': request.user, 
                                             'chat': pk,
-                                            'members': members})
+                                            'members': members,
+                                            'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
