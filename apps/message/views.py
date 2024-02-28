@@ -73,7 +73,6 @@ class MessageDeleteAPIView(views.APIView):
         return Response({'result': 'Message deleted!'})
     
 
-
 class MakeIsReadMessageAPIView(views.APIView):
     permission_classes = (IsAuthenticated,)
     
