@@ -164,3 +164,6 @@ REST_FRAMEWORK = {
 
 # Настройки django-smart-selects
 USE_DJANGO_JQUERY = True
+
+MEDIA_ROOT =  BASE_DIR / 'media'
+MEDIA_URL = '/media/'

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Message, Chat
+from .models import Message, Chat, File
 from apps.user.serializers import UserSerializer
 
 
@@ -16,10 +16,21 @@ class ChatSerializer(serializers.ModelSerializer):
         ]
         
 
+
+class FileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = File
+        fields = [
+            'id',
+            'slug',
+        ]
+
+
 class MessageSerializer(serializers.ModelSerializer):
     chat = ChatSerializer(read_only=True)
     author = UserSerializer(required=False)
     unread_users = UserSerializer(many=True, required=False)
+    files = FileSerializer(many=True, required=False)
     
     class Meta:
         model = Message
@@ -28,6 +39,7 @@ class MessageSerializer(serializers.ModelSerializer):
             'chat',
             'author',
             'text_message',
+            'files',
             'date_publication',
             'unread_users',
         ]
@@ -39,5 +51,5 @@ class MessageSerializer(serializers.ModelSerializer):
         validated_data['chat'] = chat
         message = Message.objects.create(**validated_data)
         
-        message.unread_users.add(*(i.id for i in self.context['members']))
+        message.unread_users.add(*(i.id for i in self.context['members'] if i != self.context['user']))
         return message

@@ -1,6 +1,8 @@
 from django.db import models
-from apps.user.models import CustomUser
+from django.core.validators import FileExtensionValidator
 from django.utils import timezone
+from pytils.translit import slugify
+from apps.user.models import CustomUser
 from smart_selects.db_fields import ChainedManyToManyField, ChainedForeignKey
 
 
@@ -28,6 +30,51 @@ class Chat(models.Model):
         return self.name_chat        
 
 
+
+class File(models.Model):
+    '''Модель для файла'''
+    file_name = models.CharField(
+        verbose_name='Название файла',
+        max_length=100
+    )
+    added_user = models.ForeignKey(
+        CustomUser,
+        verbose_name='Добавивший пользователь',
+        on_delete=models.CASCADE,
+    )
+    file = models.FileField(
+        verbose_name='Прикреплённые файлы',
+        upload_to='files/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['doc', 'txt', 'xlsx', 'pdf', 'jpg', 'png'])]
+    )
+    slug = models.SlugField(
+        verbose_name='Ссылка',
+        unique=True
+    )
+    date_create = models.DateTimeField(
+        verbose_name='Дата создания',
+        auto_now_add=True
+    )
+    date_update = models.DateTimeField(
+        verbose_name='Дата обновления',
+        auto_now=True
+    )
+    
+    class Meta:
+        verbose_name = 'Файл'
+        verbose_name_plural = 'Файлы'
+        
+    def __str__(self):
+        return self.slug
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.file_name)
+        super().save(*args, **kwargs)
+
+
+
 class Message(models.Model):
     '''Модель для сообщения'''
     
@@ -51,6 +98,11 @@ class Message(models.Model):
     text_message = models.TextField(
         verbose_name='Текст сообщения'
         )
+    files = models.ManyToManyField(
+        File,
+        verbose_name='Прикреплённые файлы',
+        blank=True
+        )
     date_publication = models.DateTimeField(
         verbose_name='Дата отправки', 
         default=timezone.now
@@ -69,4 +121,6 @@ class Message(models.Model):
     
     def __str__(self):
         return self.text_message
+    
+    
     

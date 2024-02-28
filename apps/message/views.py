@@ -40,6 +40,16 @@ class MessageGetPostAPIView(views.APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
+        # После отправки сообщения в чат - все предыдущие сообщения становятся прочитанными
+        try:
+            unread_messages = Chat.objects.get(pk=pk).messages.filter(unread_users=request.user)
+        except Chat.DoesNotExist:
+            return Response('Message not found!', status=HTTP_404_NOT_FOUND)
+        
+        for msg in unread_messages:
+            msg.unread_users.remove(request.user)
+            msg.save()
+        
         return Response({'sent_message': serializer.data})
 
 
@@ -48,10 +58,11 @@ class MessageDeleteAPIView(views.APIView):
     permission_classes = (IsAuthenticated,)
                
     def delete(self, request, pk):
-        '''Удаление сообщение из чата, если оно ещё не прочитано, если прочитано хотя бы одним участником- то удалять нельзя'''
+        '''Удаление сообщение из чата, если оно ещё не прочитано, если прочитано хотя бы одним участником(кроме автора)
+        - то удалять нельзя'''
         try:
             unread_users = Message.objects.get(pk=pk, author=request.user).unread_users.all()  
-            members = Message.objects.get(pk=pk).chat.members.all()
+            members = Message.objects.get(pk=pk).chat.members.exclude(username=request.user)
         except Message.DoesNotExist:
             return Response('Message not found!', status=HTTP_404_NOT_FOUND) 
 
@@ -67,21 +78,37 @@ class MakeIsReadMessageAPIView(views.APIView):
     permission_classes = (IsAuthenticated,)
     
     def patch(self, request, pk):
-        
-        unread_members = Message.objects.get(pk=pk).unread_users.all()
-        message = Message.objects.get(pk=pk)
-        if request.user not in unread_members:
-            return Response({'result': 'Сообщение уже прочитано этим пользователем!'})
-        
         try:
-            # Message.objects.get(pk=pk).unread_users.delete(request.user)
-            unread_messages = Message.objects.filter(pk__lte=pk, chat_id=message.chat_id)
-            # [msg.unread_users.delete(request.user) for msg in unread_messages]
-            print(unread_members)
-            # print(dir(unread_messages))
-            for msg in unread_messages.values():
-                print(msg)
+            unread_members = Message.objects.get(pk=pk).unread_users.all()
+            if request.user not in unread_members:
+                return Response({'result': 'Сообщения уже прочитаны этим пользователем!'})
+        
+            message = Message.objects.get(pk=pk)
+            unread_messages = Message.objects.filter(chat_id=message.chat_id, date_publication__lte=message.date_publication)
+            if unread_messages:
+                for msg in unread_messages:
+                    msg.unread_users.remove(request.user)
+                    msg.save()
+
         except Message.DoesNotExist:
             return Response('Message not found!', status=HTTP_404_NOT_FOUND)
         
-        return Response({'result': 'Сообщение прочитано!'})
+        return Response({'result': 'Сообщения прочитаны!'})
+    
+    
+    
+class GetAllUnReadMessages(views.APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def get(self, request):
+        chats = Chat.objects.filter(members=request.user)
+        count_messages = 0
+        
+        if chats:
+            for chat in chats:
+                sms = chat.messages.filter(unread_users=request.user).exclude(author=request.user)
+                count_messages += len(sms)
+        else:
+            return Response({'result': (f'Пользователь {request.user} не состоит в чатах!')})
+        
+        return Response({'result': (f'У пользователя {request.user} {count_messages} непрочитанных сообщений в {len(chats)} чатах')})
