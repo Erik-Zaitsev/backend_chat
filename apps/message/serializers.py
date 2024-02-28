@@ -52,7 +52,7 @@ class MessageSerializer(serializers.ModelSerializer):
         ]
         
     def get_files(self, obj):
-        serializer = FileSerializer(obj, context={'request': self.context['request']})
+        serializer = FileSerializer(obj, context=self.context)
         return serializer
     
     def create(self, validated_data):
