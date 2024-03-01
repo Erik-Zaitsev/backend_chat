@@ -4,3 +4,4 @@
 .vscode/
 .env
 *.py[co]
+media/

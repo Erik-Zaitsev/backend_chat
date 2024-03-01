@@ -18,17 +18,20 @@ class ChatSerializer(serializers.ModelSerializer):
 
 
 class FileSerializer(serializers.ModelSerializer):
-    # file_url = serializers.SerializerMethodField('get_file_url')
+    added_user = UserSerializer(required=False)
+    file_url = serializers.SerializerMethodField('get_file_url')
     
-    # def get_file_url(self, obj):
-    #     return self.context['request'].build_absolute_uri(obj.file_url)
+    def get_file_url(self, obj):
+        request = self.context['request']
+        return request.build_absolute_uri(obj.file.url)
         
     class Meta:
         model = File
         fields = [
             'id',
-            'slug',
-            # 'file_url'
+            'file_name',
+            'file_url',
+            'added_user',
         ]
 
 
@@ -36,7 +39,6 @@ class MessageSerializer(serializers.ModelSerializer):
     chat = ChatSerializer(read_only=True)
     author = UserSerializer(required=False)
     unread_users = UserSerializer(many=True, required=False)
-    # files = FileSerializer(many=True, required=False)
     files = serializers.SerializerMethodField()
     
     class Meta:
@@ -52,8 +54,9 @@ class MessageSerializer(serializers.ModelSerializer):
         ]
         
     def get_files(self, obj):
-        serializer = FileSerializer(obj, context=self.context)
-        return serializer
+        return FileSerializer(obj.files.all(), 
+                              context={'request': self.context['request']}, 
+                              many=True, required=False).data
     
     def create(self, validated_data):
         chat = Chat.objects.get(id=self.context['chat'])

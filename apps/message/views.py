@@ -1,10 +1,11 @@
-from .models import Chat, Message
+from .models import Chat, Message, File
 from .serializers import MessageSerializer
 from rest_framework import views
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
-
+from django.utils.encoding import iri_to_uri
+from django.http.response import HttpResponse
 
 
 # Create your views here.
@@ -18,7 +19,7 @@ class MessageGetPostAPIView(views.APIView):
             messages = Chat.objects.get(pk=pk, members=request.user).messages.all().order_by('date_publication')
         except Chat.DoesNotExist:
             return Response('Chat not found!', status=HTTP_404_NOT_FOUND)
-        return Response({'message_in_chat': MessageSerializer(messages, many=True).data})
+        return Response({'message_in_chat': MessageSerializer(messages, context={'request': request}, many=True).data})
         
         
     def post(self, request, pk):      
@@ -112,3 +113,16 @@ class GetAllUnReadMessages(views.APIView):
             return Response({'result': (f'Пользователь {request.user} не состоит в чатах!')})
         
         return Response({'result': (f'У пользователя {request.user} {count_messages} непрочитанных сообщений в {len(chats)} чатах')})
+    
+    
+    
+class GetFileAPIView(views.APIView):
+    def get(self, request, pk):
+        file = File.objects.get(pk=pk)
+        print(file)
+        print(dir(file))
+        response = HttpResponse(file, content_type='application/force-download')
+        response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file.file_name)
+        print(response)
+        return response
+        # return FileResponse(open(request.FILES, 'rb'), as_attachment=True)

@@ -45,9 +45,7 @@ class File(models.Model):
     file = models.FileField(
         verbose_name='Прикреплённые файлы',
         upload_to='files/',
-        blank=True,
-        null=True,
-        validators=[FileExtensionValidator(allowed_extensions=['doc', 'txt', 'xlsx', 'pdf', 'jpg', 'png'])]
+        validators=[FileExtensionValidator(allowed_extensions=['doc', 'docx', 'txt', 'xlsx', 'pdf', 'jpg', 'png'])]
     )
     slug = models.SlugField(
         verbose_name='Ссылка',
