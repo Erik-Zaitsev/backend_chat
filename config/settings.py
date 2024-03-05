@@ -167,3 +167,8 @@ USE_DJANGO_JQUERY = True
 
 MEDIA_ROOT =  BASE_DIR / 'media'
 MEDIA_URL = '/media/'
+
+# Настройки FTP сервера
+ftp_host = getenv("DATABASE_default_HOST")
+ftp_username = getenv("FTP_USERNAME")
+ftp_password = getenv("FTP_PASSWORD")

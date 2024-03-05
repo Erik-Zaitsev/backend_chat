@@ -47,16 +47,16 @@ class MessageAdmin(admin.ModelAdmin):
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
     list_display = [
+        'id',
         'file_name',
         'added_user',
         'file',
         'slug',
         'date_create',
-        'date_update',
     ]
     
     search_fields = ['file_name', 'added_user',]
     
     search_help_text = 'Поиск по полям: Название файла, Добавивший пользователь'
     
-    readonly_fields = ['date_create', 'date_update', 'slug',]
+    readonly_fields = ['date_create', 'slug',]

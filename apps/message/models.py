@@ -4,7 +4,7 @@ from django.utils import timezone
 from pytils.translit import slugify
 from apps.user.models import CustomUser
 from smart_selects.db_fields import ChainedManyToManyField, ChainedForeignKey
-
+from uuid import uuid4
 
 class Chat(models.Model):
     '''Модель для чата.
@@ -17,7 +17,7 @@ class Chat(models.Model):
         ('Dialog', 'Диалог'),
     )
 
-    name_chat = models.CharField(verbose_name='Название чата', max_length=100)
+    name_chat = models.CharField(verbose_name='Название чата', max_length=100, default='Чат для общения')
     type_chat = models.CharField(verbose_name='Тип чата', max_length=15, 
                                  choices=CHAT_TYPE_CHOICES, default='Dialog')
     members = models.ManyToManyField(CustomUser, verbose_name='Участники')
@@ -33,6 +33,11 @@ class Chat(models.Model):
 
 class File(models.Model):
     '''Модель для файла'''
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid4,
+        editable=False
+    )
     file_name = models.CharField(
         verbose_name='Название файла',
         max_length=100
@@ -54,10 +59,6 @@ class File(models.Model):
     date_create = models.DateTimeField(
         verbose_name='Дата создания',
         auto_now_add=True
-    )
-    date_update = models.DateTimeField(
-        verbose_name='Дата обновления',
-        auto_now=True
     )
     
     class Meta:

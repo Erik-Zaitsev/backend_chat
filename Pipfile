@@ -11,6 +11,7 @@ python-dotenv = "*"
 python-gettext = "*"
 django-smart-selects = "*"
 pytils = "*"
+uuid = "*"
 
 [dev-packages]
 

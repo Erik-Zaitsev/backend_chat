@@ -6,6 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from django.utils.encoding import iri_to_uri
 from django.http.response import HttpResponse
+from config.settings import ftp_host, ftp_username, ftp_password
+import ftplib
+from io import BytesIO
 
 
 # Create your views here.
@@ -115,14 +118,120 @@ class GetAllUnReadMessages(views.APIView):
         return Response({'result': (f'У пользователя {request.user} {count_messages} непрочитанных сообщений в {len(chats)} чатах')})
     
     
+
+class FTPServerInteraction():
+    '''
+    Класс для взаимодействия с FTP сервером
     
-class GetFileAPIView(views.APIView):
-    def get(self, request, pk):
-        file = File.objects.get(pk=pk)
-        print(file)
-        print(dir(file))
-        response = HttpResponse(file, content_type='application/force-download')
-        response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file.file_name)
-        print(response)
+    ftp_host, ftp_username, ftp_password - все переменные импортированы из config.settings.py
+    значения находятся в файле .env
+    '''
+    def interaction_with_ftp_files(request, uuid):
+        file = File.objects.get(pk=uuid)
+        string = str(file.file)
+        excpansion_file = string[string.rfind('.'):]
+        ftp_dir = str(request.user)
+        
+        # Открываю соединение с сервером
+        ftp_connect = ftplib.FTP(ftp_host, ftp_username, ftp_password)
+        
+        if request.method == 'GET':
+            buffer = BytesIO()
+            try:
+                ftp_connect.cwd(ftp_dir)
+                ftp_connect.retrbinary('retr ' + uuid + excpansion_file, buffer.write)
+            except:
+                response = Response({'result':'File or directory not found!'})
+            else:
+                response = HttpResponse(buffer.getvalue(), content_type='application/force-download')
+                response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file.file_name) + excpansion_file
+        
+        
+        elif request.method == 'POST':
+            try:
+                ftp_connect.cwd(ftp_dir)
+            except:
+                ftp_connect.mkd(ftp_dir)
+                ftp_connect.cwd(ftp_dir)
+
+            with open('media/' + string, 'rb') as fp:
+                ftp_connect.storbinary('stor ' + uuid + excpansion_file, fp)
+        
+            response = Response({'result': 'File send!'})
+            
+        
+        elif request.method == 'DELETE':
+            try:
+                ftp_connect.cwd(ftp_dir)
+                ftp_connect.delete(uuid + excpansion_file)
+            except:
+                response = Response({'result': 'File or directory not found!'})
+            else:
+                response = Response({'result': 'File delete!'})
+        
+        
+        # Закрываю соединение с сервером
+        ftp_connect.close()
+        
+        # Возвращаем значение
         return response
-        # return FileResponse(open(request.FILES, 'rb'), as_attachment=True)
+        
+        
+
+class GetFileAPIView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def post(self, request, uuid):
+        return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
+        # file = File.objects.get(pk=uuid)
+        # string = str(file.file)
+        # excpansion_file = string[string.rfind('.'):]
+        # ftp_connect = ftplib.FTP(ftp_host, ftp_username, ftp_password)
+        # ftp_dir = str(request.user)
+        
+        # try:
+        #     ftp_connect.cwd(ftp_dir)
+        # except:
+        #     ftp_connect.mkd(ftp_dir)
+        #     ftp_connect.cwd(ftp_dir)
+            
+        # with open('media/' + str(file.file), 'rb') as fp:
+        #     ftp_connect.storbinary('stor ' + uuid + excpansion_file, fp)
+        # ftp_connect.close()
+        
+        # return Response({'result': 'File send!'})
+    
+    
+    def get(self, request, uuid):
+        return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
+        # file = File.objects.get(pk=uuid)
+        # string = str(file.file)
+        # excpansion_file = string[string.rfind('.'):]
+        # ftp_connect = ftplib.FTP(ftp_host, ftp_username, ftp_password)
+        # ftp_dir = str(request.user)
+        # buffer = BytesIO()
+        
+        # try:
+        #     ftp_connect.cwd(ftp_dir)
+        #     response = ftp_connect.retrbinary('retr ' + uuid + excpansion_file, buffer.write)
+        #     ftp_connect.close()
+        # except:
+        #     return Response({'result':'File or directory not found!'})
+        # response = HttpResponse(buffer.getvalue(), content_type='application/force-download')
+        # response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file.file_name) + excpansion_file
+        # return response
+    
+    
+    def delete(self, request, uuid):
+        return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
+        # ftp_connect = ftplib.FTP(ftp_host, ftp_username, ftp_password)
+        # ftp_dir = str(request.user)
+        
+        # try:
+        #     ftp_connect.cwd(ftp_dir)
+        #     ftp_connect.delete(uuid)
+        # except:
+        #     return Response({'result': 'File or directory not found!'})
+        
+        # ftp_connect.close()
+        # return Response({'result': 'File delete!'})
