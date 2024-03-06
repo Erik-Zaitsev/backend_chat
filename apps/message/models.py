@@ -5,6 +5,7 @@ from pytils.translit import slugify
 from apps.user.models import CustomUser
 from smart_selects.db_fields import ChainedManyToManyField, ChainedForeignKey
 from uuid import uuid4
+from config.settings import MEDIA_ROOT
 
 class Chat(models.Model):
     '''Модель для чата.
@@ -47,15 +48,6 @@ class File(models.Model):
         verbose_name='Добавивший пользователь',
         on_delete=models.CASCADE,
     )
-    file = models.FileField(
-        verbose_name='Прикреплённые файлы',
-        upload_to='files/',
-        validators=[FileExtensionValidator(allowed_extensions=['doc', 'docx', 'txt', 'xlsx', 'pdf', 'jpg', 'png'])]
-    )
-    slug = models.SlugField(
-        verbose_name='Ссылка',
-        unique=True
-    )
     date_create = models.DateTimeField(
         verbose_name='Дата создания',
         auto_now_add=True
@@ -66,11 +58,8 @@ class File(models.Model):
         verbose_name_plural = 'Файлы'
         
     def __str__(self):
-        return self.slug
+        return self.file_name
     
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.file_name)
-        super().save(*args, **kwargs)
 
 
 

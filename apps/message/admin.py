@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Chat, Message, File
-from itertools import chain
+
 
 
 # Register your models here.
@@ -50,8 +50,6 @@ class FileAdmin(admin.ModelAdmin):
         'id',
         'file_name',
         'added_user',
-        'file',
-        'slug',
         'date_create',
     ]
     
@@ -59,4 +57,5 @@ class FileAdmin(admin.ModelAdmin):
     
     search_help_text = 'Поиск по полям: Название файла, Добавивший пользователь'
     
-    readonly_fields = ['date_create', 'slug',]
+    readonly_fields = ['date_create',]
+    
