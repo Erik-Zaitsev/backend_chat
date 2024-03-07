@@ -6,10 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from django.utils.encoding import iri_to_uri
 from django.http.response import HttpResponse
-from config.settings import ftp_host, ftp_username, ftp_password
+from config.settings import ftp_host, ftp_username, ftp_password, YANDEX_DISK_TOKEN
 import ftplib
 from io import BytesIO
 from uuid import uuid4
+from yadisk import YaDisk
+
 
 
 # Create your views here.
@@ -120,103 +122,122 @@ class GetAllUnReadMessages(views.APIView):
     
     
 
-class FTPServerInteraction():
-    '''
-    Класс для взаимодействия с FTP сервером
+# class FTPServerInteraction():
+#     '''
+#     Класс для взаимодействия с FTP сервером
     
-    ftp_host, ftp_username, ftp_password - все переменные импортированы из config.settings.py
-    значения находятся в файле .env
-    '''
-    def interaction_with_ftp_files(request, uuid):
-        file = File.objects.get(pk=uuid)
-        # string = str(request.data.get('file'))
-        # extensions_file = string[string.rfind('.'):]
-        file_name = str(file.file_name)
-        extension_file = file_name[file_name.rfind('.'):]
-        ftp_dir = str(request.user)
+#     ftp_host, ftp_username, ftp_password - все переменные импортированы из config.settings.py
+#     значения находятся в файле .env
+#     '''
+#     def interaction_with_ftp_files(request, uuid):
+#         file = File.objects.get(pk=uuid)
+#         # string = str(request.data.get('file'))
+#         # extensions_file = string[string.rfind('.'):]
+#         file_name = str(file.file_name)
+#         extension_file = file_name[file_name.rfind('.'):]
+#         ftp_dir = str(request.user)
         
-        # Открываю соединение с сервером
-        ftp_connect = ftplib.FTP(ftp_host, ftp_username, ftp_password)
+#         # Открываю соединение с сервером
+#         ftp_connect = ftplib.FTP(ftp_host, ftp_username, ftp_password)
         
-        if request.method == 'GET':
-            buffer = BytesIO()
-            try:
-                ftp_connect.cwd(ftp_dir)
-                ftp_connect.retrbinary('retr ' + str(uuid) + extension_file, buffer.write)
-            except:
-                response = Response({'result':'File or directory not found!'})
-            else:
-                response = HttpResponse(buffer.getvalue(), content_type='application/force-download')
-                response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file.file_name) + extension_file
+#         if request.method == 'GET':
+#             buffer = BytesIO()
+#             try:
+#                 ftp_connect.cwd(ftp_dir)
+#                 ftp_connect.retrbinary('retr ' + str(uuid) + extension_file, buffer.write)
+#             except:
+#                 response = Response({'result':'File or directory not found!'})
+#             else:
+#                 response = HttpResponse(buffer.getvalue(), content_type='application/force-download')
+#                 response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file.file_name) + extension_file
         
         
-        elif request.method == 'POST':
-            allowed_extensions = ['.doc', '.docx', '.txt', '.xlsx', '.pdf', '.jpg', '.png']
-            if extension_file not in allowed_extensions:
-                return Response({'result': 'Расширение файла не поддерживается! '
-                                f'Разрешённые расширения: {allowed_extensions}'})
+#         elif request.method == 'POST':
+#             allowed_extensions = ['.doc', '.docx', '.txt', '.xlsx', '.pdf', '.jpg', '.png']
+#             if extension_file not in allowed_extensions:
+#                 return Response({'result': 'Расширение файла не поддерживается! '
+#                                 f'Разрешённые расширения: {allowed_extensions}'})
                 
-            try:
-                ftp_connect.cwd(ftp_dir)
-            except:
-                ftp_connect.mkd(ftp_dir)
-                ftp_connect.cwd(ftp_dir)
+#             try:
+#                 ftp_connect.cwd(ftp_dir)
+#             except:
+#                 ftp_connect.mkd(ftp_dir)
+#                 ftp_connect.cwd(ftp_dir)
 
-            ftp_connect.storbinary('stor ' + str(uuid) + extension_file, request.data.get('file'))
+#             ftp_connect.storbinary('stor ' + str(uuid) + extension_file, request.data.get('file'))
         
-            response = Response({'result': 'File send at FTP server!'})
+#             response = Response({'result': 'File send at FTP server!'})
             
         
-        elif request.method == 'DELETE':
-            try:
-                ftp_connect.cwd(ftp_dir)
-                ftp_connect.delete(str(uuid) + extension_file)
-            except:
-                response = Response({'result': 'File or directory not found!'})
-            else:
-                response = Response({'result': 'File delete!'})
-                file.delete()
+#         elif request.method == 'DELETE':
+#             try:
+#                 ftp_connect.cwd(ftp_dir)
+#                 ftp_connect.delete(str(uuid) + extension_file)
+#             except:
+#                 response = Response({'result': 'File or directory not found!'})
+#             else:
+#                 response = Response({'result': 'File delete!'})
+#                 file.delete()
         
         
-        # Закрываю соединение с сервером
-        ftp_connect.close()
+#         # Закрываю соединение с сервером
+#         ftp_connect.close()
         
-        # Возвращаю значение
-        return response
+#         # Возвращаю значение
+#         return response
         
         
+
+# class GetFileAPIView(views.APIView):
+#     permission_classes = (IsAuthenticated,)
+    
+#     def post(self, request):      
+#         '''Метод для отправки файла на FTP сервер, служебная информация о файле хранится в БД'''  
+        
+#         # Создаём запись в БД
+#         uuid = uuid4()
+#         uploaded_file = File.objects.create(
+#             id=uuid,
+#             added_user=request.user,
+#             file_name=str(request.data.get('file')),
+#         )
+        
+#         # Отправляем файл на FTP сервер
+#         return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
+
+    
+#     def get(self, request):
+#         '''Метод получения файла с FTP сервера'''
+#         # Получаем из request uuid файла
+#         uuid = request.data.get('uuid')
+        
+#         # Получаем файл с FTP сервера
+#         return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
+    
+    
+#     def delete(self, request):
+#         '''Метод удаления файла с FTP сервера'''
+#         # Получаем из request uuid файла
+#         uuid = request.data.get('uuid')
+        
+#         # Удаляем файл с FTP сервера
+#         return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
+
+
 
 class GetFileAPIView(views.APIView):
     permission_classes = (IsAuthenticated,)
     
-    def post(self, request):      
-        '''Метод для отправки файла на FTP сервер, служебная информация о файле хранится в БД'''  
-        
-        # Создаём запись в БД
-        uuid = uuid4()
-        uploaded_file = File.objects.create(
-            id=uuid,
-            added_user=request.user,
-            file_name=str(request.data.get('file')),
-        )
-        
-        # Отправляем файл на FTP сервер
-        return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
+    def post(self, request):
+        yandex_disk = YaDisk(token='y0_AgAAAAByyPULAAtpZgAAAAD9YMnXAAC2Lb3Su7JH24Io7QrE5kltqeo3NQ')
 
+        # yandex_disk.upload(str(request.data.get('file')), '//' + str(request.data.get('file')))
+        # with open(str(request.data.get('file')), 'rb') as f:
+        yandex_disk.upload(request.data.get('file'), 'files/')
+        return Response({'result': 'FIle send at Yandex Disk!'})
+    
     
     def get(self, request):
-        '''Метод получения файла с FTP сервера'''
-        # Получаем из request uuid файла
-        uuid = request.data.get('uuid')
-        
-        # Получаем файл с FTP сервера
-        return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
-    
-    
+        pass
     def delete(self, request):
-        '''Метод удаления файла с FTP сервера'''
-        # Получаем из request uuid файла
-        uuid = request.data.get('uuid')
-        
-        # Удаляем файл с FTP сервера
-        return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
+        pass

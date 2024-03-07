@@ -172,3 +172,6 @@ MEDIA_URL = '/media/'
 ftp_host = getenv("DATABASE_default_HOST")
 ftp_username = getenv("FTP_USERNAME")
 ftp_password = getenv("FTP_PASSWORD")
+
+# Настройки Яндекс.Диска
+YANDEX_DISK_TOKEN = getenv("YANDEX_DISK_TOKEN")

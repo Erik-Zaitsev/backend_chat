@@ -12,6 +12,7 @@ python-gettext = "*"
 django-smart-selects = "*"
 pytils = "*"
 uuid = "*"
+yadisk = "*"
 
 [dev-packages]
 

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "032420c0f2f0b5dfe7b56a92016f5ce66480a65fd744a8be80d6abd51f83ee5c"
+            "sha256": "96c2f86c39d47de834e2305c1e665fe81005fc8f2f4f9ea763478576b2263ec5"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -125,6 +125,15 @@
             ],
             "index": "pypi",
             "version": "==1.30"
+        },
+        "yadisk": {
+            "hashes": [
+                "sha256:1052b70065f932a726d52dc936540928f19efe9b1f2be9e36bda6beb854fa294",
+                "sha256:38217dea233c6ce0dba64bc90c824b5985eea0fb41f249c7fde0b6c784f5a2ed"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==2.1.0"
         }
     },
     "develop": {}
