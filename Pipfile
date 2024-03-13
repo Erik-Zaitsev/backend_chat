@@ -13,6 +13,7 @@ django-smart-selects = "*"
 pytils = "*"
 uuid = "*"
 yadisk = "*"
+celery = {extras = ["redis"], version = "*"}
 
 [dev-packages]
 

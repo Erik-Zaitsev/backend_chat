@@ -19,12 +19,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
 class FileSerializer(serializers.ModelSerializer):
     added_user = UserSerializer(required=False)
-    # file_url = serializers.SerializerMethodField()
     link = serializers.SerializerMethodField()
-    
-    # def get_file_url(self, obj):
-    #     request = self.context['request']
-    #     return request.build_absolute_uri(obj.file.url)
         
     def get_link(self, obj):
         return 'http://127.0.0.1:8000/api/v1/file/' + str(obj.pk) 
@@ -34,7 +29,6 @@ class FileSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'file_name',
-            # 'file_url',
             'added_user',
             'link'
         ]

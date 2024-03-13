@@ -5,12 +5,13 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from django.utils.encoding import iri_to_uri
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, FileResponse
 from config.settings import ftp_host, ftp_username, ftp_password, YANDEX_DISK_TOKEN
 import ftplib
 from io import BytesIO
 from uuid import uuid4
-from yadisk import YaDisk
+import yadisk
+from workflow.tasks import send_message_at_email
 
 
 
@@ -131,8 +132,6 @@ class GetAllUnReadMessages(views.APIView):
 #     '''
 #     def interaction_with_ftp_files(request, uuid):
 #         file = File.objects.get(pk=uuid)
-#         # string = str(request.data.get('file'))
-#         # extensions_file = string[string.rfind('.'):]
 #         file_name = str(file.file_name)
 #         extension_file = file_name[file_name.rfind('.'):]
 #         ftp_dir = str(request.user)
@@ -188,56 +187,93 @@ class GetAllUnReadMessages(views.APIView):
         
         
 
-# class GetFileAPIView(views.APIView):
-#     permission_classes = (IsAuthenticated,)
-    
-#     def post(self, request):      
-#         '''Метод для отправки файла на FTP сервер, служебная информация о файле хранится в БД'''  
-        
-#         # Создаём запись в БД
-#         uuid = uuid4()
-#         uploaded_file = File.objects.create(
-#             id=uuid,
-#             added_user=request.user,
-#             file_name=str(request.data.get('file')),
-#         )
-        
-#         # Отправляем файл на FTP сервер
-#         return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
-
-    
-#     def get(self, request):
-#         '''Метод получения файла с FTP сервера'''
-#         # Получаем из request uuid файла
-#         uuid = request.data.get('uuid')
-        
-#         # Получаем файл с FTP сервера
-#         return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
-    
-    
-#     def delete(self, request):
-#         '''Метод удаления файла с FTP сервера'''
-#         # Получаем из request uuid файла
-#         uuid = request.data.get('uuid')
-        
-#         # Удаляем файл с FTP сервера
-#         return FTPServerInteraction.interaction_with_ftp_files(request, uuid)
 
 
 
+class YandexDiskInteraction():
+    '''Класс для взаимодействия с Yandex Disk'ом'''
+    
+    def interaction_with_yandex_disk(request, uuid):
+        client = yadisk.Client(token=str(YANDEX_DISK_TOKEN))
+        yandex_disk_dir = '/' + str(request.user)
+        file = File.objects.get(pk=uuid)
+        file_name = str(file.file_name)
+        extension_file = file_name[file_name.rfind('.'):]
+
+        with client:
+            if request.method == 'POST':
+                allowed_extensions = ['.doc', '.docx', '.txt', '.xlsx', '.pdf', '.jpg', '.png']
+                if extension_file not in allowed_extensions:
+                    return Response({'result': 'Расширение файла не поддерживается! '
+                                    f'Разрешённые расширения: {allowed_extensions}'})
+                    
+                try:
+                    client.upload(request.data.get('file'), yandex_disk_dir + '/' + str(request.data.get('file')))
+                except:
+                    client.mkdir(yandex_disk_dir)
+                    client.upload(request.data.get('file'), yandex_disk_dir + '/' + str(request.data.get('file')))
+                    
+                return Response({'result': 'FIle send at Yandex Disk!'})
+            
+            
+            elif request.method == 'GET':
+                buffer = BytesIO()
+                try:
+                    client.download(yandex_disk_dir + '/' + file_name, buffer)
+                except:
+                    response = Response({'result':'File or directory not found!'})
+                else:
+                    response = HttpResponse(buffer.getvalue(), content_type='application/force-download')
+                    response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file_name)
+                
+                
+            elif request.method == 'DELETE':
+                try:
+                    client.remove(yandex_disk_dir + '/' + file_name, permanently=True)
+                except:
+                    response = Response({'result': 'File or directory not found!'})
+                else:
+                    response = Response({'result': 'File delete!'})
+                    file.delete()
+            
+            
+            # Возвращаем ответ
+            return response
+        
+        
+        
 class GetFileAPIView(views.APIView):
     permission_classes = (IsAuthenticated,)
     
-    def post(self, request):
-        yandex_disk = YaDisk(token='y0_AgAAAAByyPULAAtpZgAAAAD9YMnXAAC2Lb3Su7JH24Io7QrE5kltqeo3NQ')
+    def post(self, request):      
+        '''Метод для отправки файла на Yandex Disk, служебная информация о файле хранится в БД'''  
+        
+        # Создаём запись в БД
+        uuid = uuid4()
+        uploaded_file = File.objects.create(
+            id=uuid,
+            added_user=request.user,
+            file_name=str(request.data.get('file')),
+        )
+        
+        # Отправляем файл на Yandex Disk
+        return YandexDiskInteraction.interaction_with_yandex_disk(request, uuid)
 
-        # yandex_disk.upload(str(request.data.get('file')), '//' + str(request.data.get('file')))
-        # with open(str(request.data.get('file')), 'rb') as f:
-        yandex_disk.upload(request.data.get('file'), 'files/')
-        return Response({'result': 'FIle send at Yandex Disk!'})
-    
     
     def get(self, request):
-        pass
+        '''Метод получения файла с Yandex Disk'''
+        # Получаем из request uuid файла
+        uuid = request.data.get('uuid')
+        
+        # Получаем файл с Yandex Disk
+        send_message_at_email.delay()
+        return YandexDiskInteraction.interaction_with_yandex_disk(request, uuid)
+    
+    
     def delete(self, request):
-        pass
+        '''Метод удаления файла с Yandex Disk'''
+        # Получаем из request uuid файла
+        uuid = request.data.get('uuid')
+        
+        # Удаляем файл с Yandex Disk
+        return YandexDiskInteraction.interaction_with_yandex_disk(request, uuid)

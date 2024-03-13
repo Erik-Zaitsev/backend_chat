@@ -175,3 +175,15 @@ ftp_password = getenv("FTP_PASSWORD")
 
 # Настройки Яндекс.Диска
 YANDEX_DISK_TOKEN = getenv("YANDEX_DISK_TOKEN")
+
+# # Настройки Celery
+# BROKER_URL = 'redis://192.168.239.21:6379/0'
+# BROKER_TRANSPORT = 'redis'
+
+# Настройки для рассылки
+EMAIL_HOST = smtp.yandex.ru
+EMAIL_PORT = 465
+EMAIL_HOST_USER = dreamteam035829@yandex.ru
+EMAIL_HOST_PASSWORD = drwfdvbefnxajibr
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
