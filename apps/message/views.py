@@ -11,7 +11,7 @@ import ftplib
 from io import BytesIO
 from uuid import uuid4
 import yadisk
-from workflow.tasks import send_message_at_email
+from .tasks import send_message_at_email
 
 
 
@@ -266,7 +266,7 @@ class GetFileAPIView(views.APIView):
         uuid = request.data.get('uuid')
         
         # Получаем файл с Yandex Disk
-        send_message_at_email.delay()
+        send_message_at_email(request)
         return YandexDiskInteraction.interaction_with_yandex_disk(request, uuid)
     
     

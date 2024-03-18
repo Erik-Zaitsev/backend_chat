@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .serializers import AuthTokenCaseInsensitiveSerializer, RegisterUserSerializer
 from rest_framework import views
+from apps.message.tasks import send_message_at_email
 
 
 # Create your views here.
@@ -28,5 +29,7 @@ class RegisterUserAPIView(views.APIView):
         serializer = RegisterUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        
+        send_message_at_email(request)
         
         return Response({'Пользователь был добавлен': serializer.data})
