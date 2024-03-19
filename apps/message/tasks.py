@@ -5,16 +5,18 @@ from celery import shared_task
 from config.settings import EMAIL_HOST_USER
 
 
-@shared_task
-def send_message_at_email(request):
+@app.task
+def send_message_at_email(email):
+    print('Сообщение отправлено!')
+    
     send_mail(
         subject='Приветственное сообщение от Backend Chat',
         message='Поздравляю! Вы успешно зарегистрировались на сайте!',
         from_email=EMAIL_HOST_USER,
-        recipient_list=[request.data.get('email'),],
+        recipient_list=[email],
         fail_silently=True,
     )
-    print('Сообщение отправлено!')
-    print(request.data.get('email'))
+    
+    print(email)
     return 'Done'
     

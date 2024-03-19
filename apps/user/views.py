@@ -30,6 +30,8 @@ class RegisterUserAPIView(views.APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
-        send_message_at_email(request)
+        # Получение адреса электронной почты из запроса
+        email = request.data.get('email')
+        send_message_at_email.delay(email)
         
         return Response({'Пользователь был добавлен': serializer.data})
