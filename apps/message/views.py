@@ -12,6 +12,8 @@ from io import BytesIO
 from uuid import uuid4
 import yadisk
 from .tasks import send_message_at_email
+from apps.user.models import CustomUser
+import logging
 
 
 
@@ -265,6 +267,15 @@ class GetFileAPIView(views.APIView):
         # Получаем из request uuid файла
         uuid = request.data.get('uuid')
         
+        # Получение адреса электронной почты из запроса
+        logger = logging.getLogger('main')
+        logger.info('Файл получен!')
+        us = CustomUser.objects.get(username=request.user)
+        print(us.email)
+        try:
+            send_message_at_email.delay(us.email)
+        except Exception as e:
+            print(e)
         # Получаем файл с Yandex Disk
         return YandexDiskInteraction.interaction_with_yandex_disk(request, uuid)
     

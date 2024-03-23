@@ -8,15 +8,17 @@ from config.settings import EMAIL_HOST_USER
 @app.task
 def send_message_at_email(email):
     print('Сообщение отправлено!')
-    
-    send_mail(
-        subject='Приветственное сообщение от Backend Chat',
+    try:
+        send_mail(
+        subject='Приветственное сообщение от Backend Chat2',
         message='Поздравляю! Вы успешно зарегистрировались на сайте!',
         from_email=EMAIL_HOST_USER,
-        recipient_list=[email],
+        recipient_list=[email,],
         fail_silently=True,
     )
-    
+    except Exception as e:
+        print(e)
+        
     print(email)
     return 'Done'
     

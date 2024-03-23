@@ -182,8 +182,44 @@ CELERY_RESULT_BACKEND = 'redis://192.168.226.21:6379/0'
 
 # Настройки для рассылки
 EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = '465'
+EMAIL_PORT = 465
 EMAIL_HOST_USER = 'dreamteam035829@yandex.ru'
 EMAIL_HOST_PASSWORD = 'drwfdvbefnxajibr'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Настройки для логирования
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    
+    'formatters': {
+        'console': {
+            'format': '{asctime} - {levelname} - {module} - {filename} - {message}',
+            'style': '{',
+        },
+    },
+    
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'formatter': 'console',
+            'filename': 'information.log',
+        },
+    },
+    
+    'loggers': {
+        'main': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
