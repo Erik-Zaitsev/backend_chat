@@ -1,18 +1,19 @@
-from .models import Chat, Message, File
-from .serializers import MessageSerializer
 from rest_framework import views
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from django.utils.encoding import iri_to_uri
+from django.utils.translation import gettext_lazy as _
 from django.http.response import HttpResponse, FileResponse
-from config.settings import FTP_HOST, FTP_USERNAME, FTP_PASSWORD, YANDEX_DISK_TOKEN
-import ftplib
+from .models import Chat, Message, File
+from .serializers import MessageSerializer
+from .tasks import send_message_at_email
 from io import BytesIO
 from uuid import uuid4
-import yadisk
-from .tasks import send_message_at_email
 from apps.user.models import CustomUser
+from config.settings import FTP_HOST, FTP_USERNAME, FTP_PASSWORD, YANDEX_DISK_TOKEN
+import ftplib
+import yadisk
 import logging
 
 
@@ -27,7 +28,7 @@ class MessageGetPostAPIView(views.APIView):
         try:
             messages = Chat.objects.get(pk=pk, members=request.user).messages.all().order_by('date_publication')
         except Chat.DoesNotExist:
-            return Response('Chat not found!', status=HTTP_404_NOT_FOUND)
+            return Response(_('Chat not found!'), status=HTTP_404_NOT_FOUND)
         return Response({'messages_in_chat': MessageSerializer(messages, context={'request': request}, many=True).data})
         
         
@@ -37,10 +38,10 @@ class MessageGetPostAPIView(views.APIView):
         try:
             members = Chat.objects.get(pk=pk).members.all()
         except Chat.DoesNotExist:
-            return Response('Chat not found!', status=HTTP_404_NOT_FOUND)
+            return Response(_('Chat not found!'), status=HTTP_404_NOT_FOUND)
         
         if request.user not in members:
-            return Response('У пользователя недостаточно прав!', status=HTTP_403_FORBIDDEN)
+            return Response(_('User has no rights!'), status=HTTP_403_FORBIDDEN)
 
         serializer = MessageSerializer(data=request.data, 
                                        context={
@@ -55,13 +56,13 @@ class MessageGetPostAPIView(views.APIView):
         try:
             unread_messages = Chat.objects.get(pk=pk).messages.filter(unread_users=request.user)
         except Chat.DoesNotExist:
-            return Response('Message not found!', status=HTTP_404_NOT_FOUND)
+            return Response(_('Message not found!'), status=HTTP_404_NOT_FOUND)
         
         for msg in unread_messages:
             msg.unread_users.remove(request.user)
             msg.save()
         
-        return Response({'message': 'Сообщение отправлено!', 
+        return Response({'message': _('Message send!'), 
                          'sent_message': serializer.data})
 
 
@@ -76,13 +77,13 @@ class MessageDeleteAPIView(views.APIView):
             unread_users = Message.objects.get(pk=pk, author=request.user).unread_users.all()  
             members = Message.objects.get(pk=pk).chat.members.exclude(username=request.user)
         except Message.DoesNotExist:
-            return Response('Message not found!', status=HTTP_404_NOT_FOUND) 
+            return Response(_('Message not found!'), status=HTTP_404_NOT_FOUND) 
 
         if members.difference(unread_users):
-            return Response({'result': 'Сообщение уже прочитано! Удалить нельзя!'})
+            return Response({'result': _("The message has already been read! You can't delete it!")})
 
         Message.objects.get(pk=pk).delete()     
-        return Response({'result': 'Message deleted!'})
+        return Response({'result': _('Message deleted!')})
     
 
 class MakeIsReadMessageAPIView(views.APIView):
@@ -92,7 +93,7 @@ class MakeIsReadMessageAPIView(views.APIView):
         try:
             unread_members = Message.objects.get(pk=pk).unread_users.all()
             if request.user not in unread_members:
-                return Response({'result': 'Сообщения уже прочитаны этим пользователем!'})
+                return Response({'result': _('The messages has already been read by this user!')})
         
             message = Message.objects.get(pk=pk)
             unread_messages = Message.objects.filter(chat_id=message.chat_id, date_publication__lte=message.date_publication)
@@ -102,9 +103,9 @@ class MakeIsReadMessageAPIView(views.APIView):
                     msg.save()
 
         except Message.DoesNotExist:
-            return Response('Message not found!', status=HTTP_404_NOT_FOUND)
+            return Response(_('Message not found!'), status=HTTP_404_NOT_FOUND)
         
-        return Response({'result': 'Сообщения прочитаны!'})
+        return Response({'result': _('Messages read!')})
     
     
     
@@ -148,7 +149,7 @@ class GetAllUnReadMessages(views.APIView):
 #                 ftp_connect.cwd(ftp_dir)
 #                 ftp_connect.retrbinary('retr ' + str(uuid) + extension_file, buffer.write)
 #             except:
-#                 response = Response({'result':'File or directory not found!'})
+#                 response = Response({'result': _('File or directory not found!')})
 #             else:
 #                 response = HttpResponse(buffer.getvalue(), content_type='application/force-download')
 #                 response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file.file_name) + extension_file
@@ -168,7 +169,7 @@ class GetAllUnReadMessages(views.APIView):
 
 #             ftp_connect.storbinary('stor ' + str(uuid) + extension_file, request.data.get('file'))
         
-#             response = Response({'result': 'File send at FTP server!'})
+#             response = Response({'result': _('File send at FTP server!')})
             
         
 #         elif request.method == 'DELETE':
@@ -176,9 +177,9 @@ class GetAllUnReadMessages(views.APIView):
 #                 ftp_connect.cwd(ftp_dir)
 #                 ftp_connect.delete(str(uuid) + extension_file)
 #             except:
-#                 response = Response({'result': 'File or directory not found!'})
+#                 response = Response({'result': _('File or directory not found!')})
 #             else:
-#                 response = Response({'result': 'File delete!'})
+#                 response = Response({'result': _('File delete!')})
 #                 file.delete()
         
         
@@ -213,7 +214,7 @@ class YandexDiskInteraction():
                     client.mkdir(yandex_disk_dir)
                     client.upload(request.data.get('file'), yandex_disk_dir + '/' + str(request.data.get('file')))
                     
-                return Response({'result': 'FIle send at Yandex Disk!'})
+                return Response({'result': _('FIle send at Yandex Disk!')})
             
             
             elif request.method == 'GET':
@@ -221,7 +222,7 @@ class YandexDiskInteraction():
                 try:
                     client.download(yandex_disk_dir + '/' + file_name, buffer)
                 except:
-                    response = Response({'result':'File or directory not found!'})
+                    response = Response({'result': _('File or directory not found!')})
                 else:
                     response = HttpResponse(buffer.getvalue(), content_type='application/force-download')
                     response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'' + iri_to_uri(file_name)
@@ -231,9 +232,9 @@ class YandexDiskInteraction():
                 try:
                     client.remove(yandex_disk_dir + '/' + file_name, permanently=True)
                 except:
-                    response = Response({'result': 'File or directory not found!'})
+                    response = Response({'result': _('File or directory not found!')})
                 else:
-                    response = Response({'result': 'File delete!'})
+                    response = Response({'result': _('File delete!')})
                     file.delete()
             
             

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-21 16:44+0200\n"
+"POT-Creation-Date: 2024-03-29 13:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,9 +16,55 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
-"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: .\apps\message\views.py:31 .\apps\message\views.py:41
+msgid "Chat not found!"
+msgstr "Чат не найден!"
+
+#: .\apps\message\views.py:44
+msgid "User has no rights!"
+msgstr "Пользователь не имеет нужных прав!"
+
+#: .\apps\message\views.py:59 .\apps\message\views.py:80
+#: .\apps\message\views.py:106
+msgid "Message not found!"
+msgstr "Сообщение не найдено!"
+
+#: .\apps\message\views.py:65
+msgid "Message send!"
+msgstr "Сообщение отправлено!"
+
+#: .\apps\message\views.py:83
+msgid "The message has already been read! You can't delete it!"
+msgstr "Сообщение уже прочитано! Удалить нельзя!"
+
+#: .\apps\message\views.py:86
+msgid "Message deleted!"
+msgstr "Сообщение удалено!"
+
+#: .\apps\message\views.py:96
+msgid "The messages has already been read by this user!"
+msgstr "Сообщение уже прочитано этим пользователем!"
+
+#: .\apps\message\views.py:108
+msgid "Messages read!"
+msgstr "Сообщение прочитано!"
+
+#: .\apps\message\views.py:217
+msgid "FIle send at Yandex Disk!"
+msgstr "Файл отпрален на Yandex Disk!"
+
+#: .\apps\message\views.py:225 .\apps\message\views.py:235
+msgid "File or directory not found!"
+msgstr "Файл или директория не найдены!"
+
+#: .\apps\message\views.py:237
+msgid "File delete!"
+msgstr "Файл удалён!"
+
 #: .\apps\user\serializers.py:9
 msgid "Email"
 msgstr "Почта"
@@ -31,26 +77,31 @@ msgstr "Пароль"
 msgid "Token"
 msgstr "Токен"
 
-#: .\apps\user\serializers.py:31
+#: .\apps\user\serializers.py:34
 msgid "There is no user with such credentials."
 msgstr "Пользователя с такими учетными данными нет."
 
-#: .\apps\user\serializers.py:35
+#: .\apps\user\serializers.py:39
 msgid "The \"is_active\" field at user must be set to True."
-msgstr "Для поля \"is_active\" у пользователя должно быть установлено значение True."
+msgstr ""
+"Для поля \"is_active\" у пользователя должно быть установлено значение True."
 
-#: .\apps\user\serializers.py:43
+#: .\apps\user\serializers.py:49
 msgid "Incorrect password."
 msgstr "Неверный пароль."
 
-#: .\apps\user\serializers.py:46
+#: .\apps\user\serializers.py:52
 msgid "The fields \"email\" and \"password\" are required."
 msgstr "Поля \"email\" и \"пароль\" обязательны для заполнения."
 
-#: .\config\settings.py:125
-msgid "English"
-msgstr "Английский"
+#: .\apps\user\views.py:39
+msgid "User is registered!"
+msgstr "Пользователь успешно зарегистрирован!"
 
 #: .\config\settings.py:126
 msgid "Russian"
 msgstr "Русский"
+
+#: .\config\settings.py:127
+msgid "English"
+msgstr "Английский"

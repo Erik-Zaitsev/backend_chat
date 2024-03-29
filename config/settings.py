@@ -154,7 +154,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-
     ),
     
     'DEFAULT_PERMISSIONS_CLASSES': (
@@ -165,6 +164,7 @@ REST_FRAMEWORK = {
 # Настройки django-smart-selects
 USE_DJANGO_JQUERY = True
 
+# Настройки media
 MEDIA_ROOT =  BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 

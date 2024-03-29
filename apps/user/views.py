@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from .serializers import AuthTokenCaseInsensitiveSerializer, RegisterUserSerializer
 from rest_framework import views
 from apps.message.tasks import send_message_at_email
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your views here.
@@ -32,6 +33,7 @@ class RegisterUserAPIView(views.APIView):
         
         # Получение адреса электронной почты из запроса
         email = request.data.get('email')
+        # Вызов задачи celery и отправка приветственного сообщения на почту новому пользователю при регистрации
         send_message_at_email.delay(email)
         
-        return Response({'message': 'Пользователь был добавлен', 'data': serializer.data})
+        return Response({'message': _('User is registered!'), 'data': serializer.data})
