@@ -28,7 +28,7 @@ class MessageGetPostAPIView(views.APIView):
             messages = Chat.objects.get(pk=pk, members=request.user).messages.all().order_by('date_publication')
         except Chat.DoesNotExist:
             return Response('Chat not found!', status=HTTP_404_NOT_FOUND)
-        return Response({'message_in_chat': MessageSerializer(messages, context={'request': request}, many=True).data})
+        return Response({'messages_in_chat': MessageSerializer(messages, context={'request': request}, many=True).data})
         
         
     def post(self, request, pk):      
@@ -61,7 +61,8 @@ class MessageGetPostAPIView(views.APIView):
             msg.unread_users.remove(request.user)
             msg.save()
         
-        return Response({'sent_message': serializer.data})
+        return Response({'message': 'Сообщение отправлено!', 
+                         'sent_message': serializer.data})
 
 
 
@@ -189,9 +190,6 @@ class GetAllUnReadMessages(views.APIView):
         
         
 
-
-
-
 class YandexDiskInteraction():
     '''Класс для взаимодействия с Yandex Disk'ом'''
     
@@ -272,10 +270,7 @@ class GetFileAPIView(views.APIView):
         logger.info('Файл получен!')
         us = CustomUser.objects.get(username=request.user)
         print(us.email)
-        try:
-            send_message_at_email.delay(us.email)
-        except Exception as e:
-            print(e)
+        send_message_at_email.delay(us.email)
         # Получаем файл с Yandex Disk
         return YandexDiskInteraction.interaction_with_yandex_disk(request, uuid)
     

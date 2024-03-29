@@ -16,16 +16,16 @@ class CustomUserManager(BaseUserManager):
         if not password:
             raise ValueError('Обязательное поле "Пароль"')
       
-        CustomUser = self.model(email=self.normalize_email(email))
+        custom_user = self.model(email=self.normalize_email(email))
     
-        CustomUser.email = email
-        CustomUser.username = username
-        CustomUser.set_password(password)
-        CustomUser.is_staff = False
-        CustomUser.is_superuser = False
-        CustomUser.is_active = True
-        CustomUser.save(using=self._db)
-        return CustomUser
+        custom_user.email = email
+        custom_user.username = username
+        custom_user.set_password(password)
+        custom_user.is_staff = False
+        custom_user.is_superuser = False
+        custom_user.is_active = True
+        custom_user.save(using=self._db)
+        return custom_user
     
 
     def create_staffuser(self, email, username, password):
@@ -36,16 +36,16 @@ class CustomUserManager(BaseUserManager):
         if not password:
             raise ValueError('Обязательное поле "Пароль"')
 
-        CustomUser = self.model(email=self.normalize_email(email))
+        custom_user = self.model(email=self.normalize_email(email))
     
-        CustomUser.email = email
-        CustomUser.username = username
-        CustomUser.set_password(password)
-        CustomUser.is_staff = True
-        CustomUser.is_superuser = False
-        CustomUser.is_active = True
-        CustomUser.save(using=self._db)
-        return CustomUser
+        custom_user.email = email
+        custom_user.username = username
+        custom_user.set_password(password)
+        custom_user.is_staff = True
+        custom_user.is_superuser = False
+        custom_user.is_active = True
+        custom_user.save(using=self._db)
+        return custom_user
         
         
     def create_superuser(self, email, username, password):
@@ -56,16 +56,16 @@ class CustomUserManager(BaseUserManager):
         if not password:
             raise ValueError('Обязательное поле "Пароль"')
         
-        CustomUser = self.model(email=self.normalize_email(email))
+        custom_user = self.model(email=self.normalize_email(email))
     
-        CustomUser.email = email
-        CustomUser.username = username
-        CustomUser.set_password(password)
-        CustomUser.is_staff = True
-        CustomUser.is_superuser = True
-        CustomUser.is_active = True
-        CustomUser.save(using=self._db)
-        return CustomUser
+        custom_user.email = email
+        custom_user.username = username
+        custom_user.set_password(password)
+        custom_user.is_staff = True
+        custom_user.is_superuser = True
+        custom_user.is_active = True
+        custom_user.save(using=self._db)
+        return custom_user
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):

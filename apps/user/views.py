@@ -34,4 +34,4 @@ class RegisterUserAPIView(views.APIView):
         email = request.data.get('email')
         send_message_at_email.delay(email)
         
-        return Response({'Пользователь был добавлен': serializer.data})
+        return Response({'message': 'Пользователь был добавлен', 'data': serializer.data})
