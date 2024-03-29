@@ -169,22 +169,22 @@ MEDIA_ROOT =  BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
 # Настройки FTP сервера
-ftp_host = getenv("DATABASE_default_HOST")
-ftp_username = getenv("FTP_USERNAME")
-ftp_password = getenv("FTP_PASSWORD")
+FTP_HOST = getenv("DATABASE_default_HOST")
+FTP_USERNAME = getenv("FTP_USERNAME")
+FTP_PASSWORD = getenv("FTP_PASSWORD")
 
 # Настройки Яндекс.Диска
 YANDEX_DISK_TOKEN = getenv("YANDEX_DISK_TOKEN")
 
 # Настройки Celery
-CELERY_BROKER_URL = 'redis://192.168.226.21:6379/0'
-CELERY_RESULT_BACKEND = 'redis://192.168.226.21:6379/0'
+CELERY_BROKER_URL = getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = getenv("CELERY_RESULT_BACKEND")
 
 # Настройки для рассылки
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'dreamteam035829@yandex.ru'
-EMAIL_HOST_PASSWORD = 'drwfdvbefnxajibr'
+EMAIL_HOST = getenv("EMAIL_HOST")
+EMAIL_PORT = getenv("EMAIL_PORT")
+EMAIL_HOST_USER = getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

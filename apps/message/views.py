@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from django.utils.encoding import iri_to_uri
 from django.http.response import HttpResponse, FileResponse
-from config.settings import ftp_host, ftp_username, ftp_password, YANDEX_DISK_TOKEN
+from config.settings import FTP_HOST, FTP_USERNAME, FTP_PASSWORD, YANDEX_DISK_TOKEN
 import ftplib
 from io import BytesIO
 from uuid import uuid4
@@ -129,7 +129,7 @@ class GetAllUnReadMessages(views.APIView):
 #     '''
 #     Класс для взаимодействия с FTP сервером
     
-#     ftp_host, ftp_username, ftp_password - все переменные импортированы из config.settings.py
+#     FTP_HOST, FTP_USERNAME, FTP_PASSWORD - все переменные импортированы из config.settings.py
 #     значения находятся в файле .env
 #     '''
 #     def interaction_with_ftp_files(request, uuid):
@@ -139,7 +139,7 @@ class GetAllUnReadMessages(views.APIView):
 #         ftp_dir = str(request.user)
         
 #         # Открываю соединение с сервером
-#         ftp_connect = ftplib.FTP(ftp_host, ftp_username, ftp_password)
+#         ftp_connect = ftplib.FTP(FTP_HOST, FTP_USERNAME, FTP_PASSWORD)
         
 #         if request.method == 'GET':
 #             buffer = BytesIO()
